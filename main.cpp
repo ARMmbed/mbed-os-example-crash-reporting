@@ -12,6 +12,8 @@ static bool continuous_reboot_test = false;
 void mbed_error_reboot_callback(mbed_error_ctx *error_context) {
     printf("Reboor error callback received");
     reboot_error_happened = 1;
+    mbed_get_reboot_error_info(&error_ctx);
+    mbed_reset_reboot_error_info();
 }
 
 // main() runs in its own thread in the OS
@@ -23,7 +25,7 @@ int main() {
         generate_bus_fault_unaligned_access();
         printf("\nForcing exception failed\n");
     } else {
-        if(MBED_SUCCESS == mbed_get_reboot_error_info(&error_ctx)) {
+        if(error_ctx.error_status < 0) {
             printf("\nSuccessfully read reboot info ==> \n");
             printf("\n  error status: 0x%08lX", (uint32_t)error_ctx.error_status);
             printf("\n  error value: 0x%08lX", (uint32_t)error_ctx.error_value);
