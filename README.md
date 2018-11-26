@@ -29,6 +29,20 @@ cd mbed-os-example-crash-reporting
 mbed deploy
 ```
 
+#### Description
+
+This example demonstrates Mbed OS crash-reporting feature and the new APIs associated with it. If you look at the main.cpp, you will see a
+function with signature `void mbed_error_reboot_callback(mbed_error_ctx *error_context)`. This function is the callback called during Mbed-OS 
+initialization if the system rebooted due to a fatal error. This function is called with a pointer to `mbed_error_ctx` structure which captures the
+error context which triggered the reboot. When you run this program(see `main.cpp`), it will force a fatal error by triggering an exception,
+which causes an auto-reboot(warm-reset) of the system. Note that the system captures the error context in a special location in RAM before 
+triggering the auto-reboot. And during the reboot, the system will detect that the reboot was caused by a fatal error and it calls the 
+`mbed_error_reboot_callback()` with the pointer to error context captured in RAM. The callback function records the fact that a reboot
+occurred due to a fatal error(using a local variable named `reboot_error_happened`) and it captures the error context using `mbed_get_reboot_error_info()`
+and resets the error context captured by the system using `mbed_reset_reboot_error_info()`. The system continues to boot and it eventually enters
+application `main()`. Note that this is the second time the `main()` is getting called after reboot. This time, `main()` detects that a reboot
+occurred due to fatal error(using `reboot_error_happened`) and it prints out the error context information to the terminal.
+
 #### Compile the example
 
 Compile the application as below using ARM compiler. If you want to use GCC or IAR toolchains, use GCC_ARM or IAR for -t option.
@@ -143,4 +157,8 @@ For more info, visit: https://armmbed.github.io/mbedos-error/?error=0x80FF013D
 Reboor error callback received
 
 ```
+
+#### Referenes
+https://github.com/ARMmbed/mbed-os/blob/master/docs/design-documents/platform/crash-reporting/crash_reporting.md
+
 
