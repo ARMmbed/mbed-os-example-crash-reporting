@@ -11,7 +11,7 @@ static bool continuous_reboot_test = false;
 
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
 void mbed_error_reboot_callback(mbed_error_ctx *error_context) {
-    printf("Reboor error callback received");
+    printf("\nmbed_error_reboot_callback: System rebooting, reboot error callback received");
     reboot_error_happened = 1;
     mbed_get_reboot_error_info(&error_ctx);
     mbed_reset_reboot_error_info();
@@ -21,7 +21,7 @@ void mbed_error_reboot_callback(mbed_error_ctx *error_context) {
 // main() runs in its own thread in the OS
 int main() {
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED  
-    printf("\nMbed-OS crash reporting test\n");
+    printf("\n\nMbed-OS crash reporting test: main()\n");
     if((reboot_error_happened == 0) || continuous_reboot_test) {
         printf("\nForcing exception\n");
         generate_bus_fault_unaligned_access();
