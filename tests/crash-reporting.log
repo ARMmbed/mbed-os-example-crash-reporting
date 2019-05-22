@@ -1,0 +1,33 @@
+= System will be rebooted due to a fatal error =
+= Reboot count\(=1\) reached maximum, system will halt after rebooting =
+mbed_error_reboot_callback: System rebooting, reboot error callback received
+
+Mbed-OS crash reporting test: main\(\)
+
+Successfully read reboot info ==>
+
+  error status: 0x[0-9a-fA-F]{8}
+  error value: 0x[0-9a-fA-F]{8}
+  error address: 0x[0-9a-fA-F]{8}
+  error reboot count: 0x[0-9a-fA-F]{8}
+  error crc: 0x[0-9a-fA-F]{8}
+
+Crash Report data captured:
+\[0\]: 0x[0-9a-fA-F]{8}
+\[1\]: 0x[0-9a-fA-F]{8}
+\[2\]: 0x[0-9a-fA-F]{8}
+\[3\]: 0x[0-9a-fA-F]{8}
+\[4\]: 0x[0-9a-fA-F]{8}
+\[5\]: 0x[0-9a-fA-F]{8}
+\[6\]: 0x[0-9a-fA-F]{8}
+\[7\]: 0x[0-9a-fA-F]{8}
+\[8\]: 0x[0-9a-fA-F]{8}
+\[9\]: 0x[0-9a-fA-F]{8}
+\[10\]: 0x[0-9a-fA-F]{8}
+\[11\]: 0x[0-9a-fA-F]{8}
+\[12\]: 0x[0-9a-fA-F]{8}
+\[13\]: 0x[0-9a-fA-F]{8}
+\[14\]: 0x[0-9a-fA-F]{8}
+\[15\]: 0x[0-9a-fA-F]{8}
+
+Mbed-OS crash reporting test completed
