@@ -3,13 +3,13 @@
 Examples are tested using tool [htrun](https://github.com/ARMmbed/mbed-os-tools/tree/master/packages/mbed-host-tests) and templated print log. 
 
 To run the test, use following command after you build the example:
-
-This assumes that example compiled with `GCC_ARM` and target `K64F`(DUT) with a mount point of `D:` and a serial port on `COM4`
-
+```bash
+$ mbedhtrun -d <MOUNT_POINT> -p <SERIAL_PORT> -m <TARGET> -f ./BUILD/<TARGET>/<TOOLCHAIN>/mbed-os-example-crash-reporting.bin --compare-log tests/crash-reporting.log
 ```
-mbedhtrun -d D: -p COM4 -m K64F -f .\BUILD\K64F\GCC_ARM\mbed-os-example-crash-reporting.bin --compare-log tests\crash-reporting.log
+For example:
+```bash
+$ mbedhtrun -d /media/user01/DAPLINK -p /dev/ttyACM0 -m K64F -f ./BUILD/K64F/GCC_ARM/mbed-os-example-crash-reporting.bin --compare-log tests/crash-reporting.log
 ```
 
 
 More details about `htrun` are [here](https://github.com/ARMmbed/mbed-os-tools/tree/master/packages/mbed-host-tests#testing-mbed-os-examples).
-
