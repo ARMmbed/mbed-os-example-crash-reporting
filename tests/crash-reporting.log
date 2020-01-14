@@ -6,28 +6,28 @@ Mbed-OS crash reporting test: main\(\)
 
 Successfully read reboot info ==>
 
-  error status: 0x[0-9a-fA-F]{8}
-  error value: 0x[0-9a-fA-F]{8}
-  error address: 0x[0-9a-fA-F]{8}
-  error reboot count: 0x[0-9a-fA-F]{8}
-  error crc: 0x[0-9a-fA-F]{8}
+  error status: 0x[0-9a-fA-F]+
+  error value: 0x[0-9a-fA-F]+
+  error address: 0x[0-9a-fA-F]+
+  error reboot count: 0x[0-9a-fA-F]+
+  error crc: 0x[0-9a-fA-F]+
 
 Crash Report data captured:
-\[0\]: 0x[0-9a-fA-F]{8}
-\[1\]: 0x[0-9a-fA-F]{8}
-\[2\]: 0x[0-9a-fA-F]{8}
-\[3\]: 0x[0-9a-fA-F]{8}
-\[4\]: 0x[0-9a-fA-F]{8}
-\[5\]: 0x[0-9a-fA-F]{8}
-\[6\]: 0x[0-9a-fA-F]{8}
-\[7\]: 0x[0-9a-fA-F]{8}
-\[8\]: 0x[0-9a-fA-F]{8}
-\[9\]: 0x[0-9a-fA-F]{8}
-\[10\]: 0x[0-9a-fA-F]{8}
-\[11\]: 0x[0-9a-fA-F]{8}
-\[12\]: 0x[0-9a-fA-F]{8}
-\[13\]: 0x[0-9a-fA-F]{8}
-\[14\]: 0x[0-9a-fA-F]{8}
-\[15\]: 0x[0-9a-fA-F]{8}
+\[0\]: 0x[0-9a-fA-F]+
+\[1\]: 0x[0-9a-fA-F]+
+\[2\]: 0x[0-9a-fA-F]+
+\[3\]: 0x[0-9a-fA-F]+
+\[4\]: 0x[0-9a-fA-F]+
+\[5\]: 0x[0-9a-fA-F]+
+\[6\]: 0x[0-9a-fA-F]+
+\[7\]: 0x[0-9a-fA-F]+
+\[8\]: 0x[0-9a-fA-F]+
+\[9\]: 0x[0-9a-fA-F]+
+\[10\]: 0x[0-9a-fA-F]+
+\[11\]: 0x[0-9a-fA-F]+
+\[12\]: 0x[0-9a-fA-F]+
+\[13\]: 0x[0-9a-fA-F]+
+\[14\]: 0x[0-9a-fA-F]+
+\[15\]: 0x[0-9a-fA-F]+
 
 Mbed-OS crash reporting test completed
