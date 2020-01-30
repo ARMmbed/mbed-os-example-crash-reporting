@@ -1,108 +1,72 @@
-# Application to demonstrate Mbed-OS crash reporting feature
+![](./resources/official_armmbed_example_badge.png)
+# Crash Reporting Mbed OS example
 
-This example demonstrates how Mbed OS crash-reporting works and the new APIs associated with it.
+This example demonstrates how Mbed OS crash reporting works on a Mbed OS enabled platform.
 
-**Table of contents:**
+You can find more information about the crash reporting APIs [here](https://os.mbed.com/docs/mbed-os/v5.15/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
-1. [Requirements](#requirements)
-1. [Setup](#setup)
-   - [Clone the example](#import-the-example)
-   - [Compile the example](#compile-the-example)
-   - [Run the example](#run-the-example)
+You can build this project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tool [Arm Mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli).
 
-## Requirements
+1. Install Mbed CLI.
+1. Clone this repository on your system.
+1. Change the current directory to where the project was cloned.
 
-This example program uses K64F as the test device.
+## Application functionality
 
+This example demonstrates the Mbed OS crash-reporting feature and the APIs associated with it. In the first pass, the application generates a fault wich causes the system to reboot. In the second pass, the application detects that the reboot was caused by an error and prints the fault context information in the console.
 
-## Setup
+First pass:
+- During Mbed OS initialization, the system checks the Crash-data-RAM region and detects that there was no fault.
+- main() is called.
+   - An exception is generated which causes an auto-reboot (warm-reset) of the system. The system captures the error-context in a special location in RAM before triggering the auto-reboot.
+- The system auto-reboots.
 
-#### Clone the example
+Second pass:
+- During Mbed OS initialization, the system checks the Crash-data-RAM region, detects that the reboot was due to a fatal error and calls `mbed_error_reboot_callback()` with a pointer to the error context stored in RAM. In this example, the callback function (WEAK function) is overridden. A global variable `reboot_error_happened` is set to record that reboot was due to an error. Then the function prints information about the error context in the console and resets the saved context captured by the system in RAM using `mbed_reset_reboot_error_info()`.
+- main() is called.
+   - The application detects that the reboot was caused by an error using `reboot_error_happened`. It proceeds to retrieves the fault context using `mbed_get_reboot_fault_context()` and prints it.
 
-Setup your Mbed development environment as described in - [Get started with Mbed OS](https://os.mbed.com/docs/latest/tutorials/your-first-program.html).
+## Building and running
 
-From the command-line, clone the example:
+1. Connect a USB cable between the USB port on the target and the host computer.
+1. Run this command to build the example project and program the microcontroller flash memory:
 
-```
-git clone https://github.com/ARMmbed/mbed-os-example-crash-reporting
-cd mbed-os-example-crash-reporting
-mbed deploy
-```
+    ```bash
+    $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash --sterm
+    ```
 
-#### Description
+(Note: You can use the Mbed CLI command-line option "--sterm" to open a serial terminal after flashing.)
 
-This example demonstrates Mbed OS crash-reporting feature and the new APIs associated with it. If you look at the main.cpp, you will see a
-function with signature `void mbed_error_reboot_callback(mbed_error_ctx *error_context)`. This function is the callback called during Mbed-OS 
-initialization if the system rebooted due to a fatal error. This function is called with a pointer to `mbed_error_ctx` structure which captures the
-error-context which triggered the reboot. When you run this program(see `main.cpp`), it will force an exception,
-which causes an auto-reboot(warm-reset) of the system. Note that the system captures the error-context in a special location in RAM before 
-triggering the auto-reboot. During the reboot, the system will detect that the reboot was caused by a fatal error and it calls the 
-`mbed_error_reboot_callback()` with a pointer to the error context captured in RAM. The callback function records the fact that a reboot
-occurred using a local variable named `reboot_error_happened` and it captures the `mbed_error_ctx` using `mbed_get_reboot_error_info()`
-and resets the saved context captured by the system using `mbed_reset_reboot_error_info()`. The system continues to boot and it eventually enters
-application `main()`. Note that this is the second time the `main()` is getting called after reboot. This time, `main()` detects that a reboot
-using `reboot_error_happened` and it prints out the error context information to the terminal.
+Your PC may take a few minutes to compile your code.
 
-#### Compile the example
+The binary is located at `./BUILD/<TARGET>/<TOOLCHAIN>/mbed-os-example-crash-reporting.bin`.
 
-Compile the application as below using ARM compiler. If you want to use GCC or IAR toolchains, use GCC_ARM or IAR for -t option.
+Alternatively, you can manually copy the binary to the target, which gets mounted on the host computer through USB.
 
-```
-mbed compile -m K64F -t ARM
+Depending on the target, you can build the example project with the `GCC_ARM`, `ARM` or `IAR` toolchain. After installing Arm Mbed CLI, run the command below to determine which toolchain supports your target:
+
+```bash
+$ mbed compile -S
 ```
 
-This may take few minutes and once its successfully completed it would generate the output as below.
+## Expected output
 
+The serial terminal shows an output similar to the following:
 ```
-Link: mbed-os-example-crash-reporting
-Elf2Bin: mbed-os-example-crash-reporting
-+------------------+-------+-------+------+
-| Module           | .text | .data | .bss |
-+------------------+-------+-------+------+
-| [lib]\c_w.l      | 12963 |    16 |  348 |
-| [lib]\cpprt_w.l  |    42 |     0 |    0 |
-| [lib]\fz_wm.l    |    18 |     0 |    0 |
-| [lib]\m_wm.l     |    48 |     0 |    0 |
-| anon$$obj.o      |    32 |     0 | 1024 |
-| main.o           |  2057 |     0 |  268 |
-| mbed-os\drivers  |   130 |     0 |    0 |
-| mbed-os\features | 16840 |     0 |  304 |
-| mbed-os\hal      |  1660 |    30 |   64 |
-| mbed-os\platform |  4565 |   104 |  604 |
-| mbed-os\rtos     | 14646 |  2310 | 4592 |
-| mbed-os\targets  |  9249 |   104 |  324 |
-| Subtotals        | 62250 |  2564 | 7528 |
-+------------------+-------+-------+------+
-Total Static RAM memory (data + bss): 10092 bytes
-Total Flash memory (text + data): 64814 bytes
+--- Terminal on /dev/tty.usbmodem11102 - 9600,8,N,1 ---
 
-Image: .\BUILD\k64f\arm\mbed-os-example-crash-reporting.bin
-```
-
-#### Run the example
-
-1. Connect a K64F device to your pc
-1. Open a serial terminal connected to the device
-1. Copy the binary file to the device.
-1. Reset the device by pressing the reset button to start the program.
-
-The output should look similar to below:
-
-```
-
-Mbed-OS crash reporting test
-
-Forcing exception
+This is the crash reporting Mbed OS example
+1st pass: Inject the fault exception
 
 ++ MbedOS Fault Handler ++
 
 FaultType: HardFault
 
 Context:
-R0   : 0000AAA3
-R1   : 00000208
-R2   : 00005D70
-R3   : 00004B95
+R0   : 0000DE54
+R1   : 00000000
+R2   : E000ED00
+R3   : 0000AAA3
 R4   : 00000000
 R5   : 00000000
 R6   : 00000000
@@ -111,13 +75,13 @@ R8   : 00000000
 R9   : 00000000
 R10  : 00000000
 R11  : 00000000
-R12  : 00008759
-SP   : 20001FB0
-LR   : 00002C59
-PC   : 00005CB8
-xPSR : 01000000
-PSP  : 20001F48
-MSP  : 2002FFD8
+R12  : FFFFFFFF
+SP   : 20002E38
+LR   : 0000181F
+PC   : 0000178C
+xPSR : 010F0000
+PSP  : 20002E18
+MSP  : 2002FFC0
 CPUID: 410FC241
 HFSR : 40000000
 MMFSR: 00000000
@@ -136,34 +100,92 @@ Stack: PSP
 ++ MbedOS Error Info ++
 Error Status: 0x80FF013D Code: 317 Module: 255
 Error Message: Fault exception
-Location: 0x5F3F
-Error Value: 0x5CB8
-Current Thread: main  Id: 0x20001FC0 Entry: 0x64F9 StackSize: 0x1000 StackMem: 0x20000FC0 SP: 0x2002FF70
-For more info, visit: https://armmbed.github.io/mbedos-error/?error=0x80FF013D
--- MbedOS Error Info -
-== Your last reboot was triggered by an error, below is the error information ==
-
-++ MbedOS Error Info ++
-Error Status: 0x80FF013D Code: 317 Module: 255
-Error Message: System rebooted due to fatal error
-Location: 0x5F3F
-File: mbed_error.c+211
-Error Value: 0x5CB8
-Current Thread: main  Id: 0x20001FC0 Entry: 0x64F9 StackSize: 0x1000 StackMem: 0x20000FC0 SP: 0x2002FF70
-For more info, visit: https://armmbed.github.io/mbedos-error/?error=0x80FF013D
+Location: 0x178C
+Error Value: 0x1FFF0400
+Current Thread: main Id: 0x20000E68 Entry: 0x31E7 StackSize: 0x1000 StackMem: 0x20001E60 SP: 0x20002E38
+For more info, visit: https://mbed.com/s/error?error=0x80FF013D&tgt=K64F
 -- MbedOS Error Info --
 
-== Reboot count(=1) exceeded maximum, system halting ==
-Reboor error callback received
+= System will be rebooted due to a fatal error =
 
+(before main) mbed_error_reboot_callback invoked with the following error context:
+    Status      : 0x80FF013D
+    Value       : 0x1FFF0400
+    Address     : 0x178C
+    Reboot count: 0x1
+    CRC         : 0x60F72ECE
+
+This is the crash reporting Mbed OS example.
+2nd pass: Retrieve the fault context using mbed_get_reboot_fault_context
+    R0   : 0xDE54
+    R1   : 0x0
+    R2   : 0xE000ED00
+    R3   : 0xAAA3
+    R4   : 0x0
+    R5   : 0x0
+    R6   : 0x0
+    R7   : 0x0
+    R8   : 0x0
+    R9   : 0x0
+    R10   : 0x0
+    R11   : 0x0
+    R12   : 0xFFFFFFFF
+    SP   : 0x20002E38
+    LR   : 0x181F
+    PC   : 0x178C
+    xPSR : 0x10F0000
+    PSP  : 0x20002E18
+    MSP  : 0x2002FFC0
+
+Mbed OS crash reporting example completed
+```
+## Configuring the application
+
+You can enable the crash reporting feature by setting `platform.crash-capture-enabled` to true in the application configuration file:
+```
+{
+    "target_overrides": {
+        "*": {            
+            "platform.crash-capture-enabled": true            
+        }
+    }
+}
 ```
 
-#### Referenes
-https://github.com/ARMmbed/mbed-os/blob/master/docs/design-documents/platform/crash-reporting/crash_reporting.md
+At present this feature is only enabled on some targets by default. To enable it on your target then your target the scatter file should be modified to reserve a dedicated region in RAM. You can find more details [here](https://os.mbed.com/docs/mbed-os/v5.15/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
-## License and contributions
+## Using mbed_get_reboot_error_info() to retrieve the reboot error context
 
-The software is provided under Apache-2.0 license. Contributions to this project are accepted under the same license. Please see [contributing.md](CONTRIBUTING.md) for more info.
+You can retrieve the reboot error context in two ways:
+1. Using `mbed_error_reboot_callback()` as shown in this example.
+1. Or using `mbed_get_reboot_error_info()` as shown below:
+
+```
+int main()
+{
+    mbed_error_ctx error_context;
+    if (mbed_get_reboot_error_info(&error_context) != MBED_ERROR_ITEM_NOT_FOUND) {
+        printf("Retrieved reboot error context\n");
+            
+        mbed_fault_context_t fault_ctx;
+        mbed_get_reboot_fault_context(&fault_ctx);
+        printf("Retrieved fault context\n");
+    }
+}
+```
+
+## Troubleshooting 
+If you have problems, you can review the [documentation](https://os.mbed.com/docs/latest/tutorials/debugging.html) for suggestions on what could be wrong and how to fix it. 
+
+## Related links
+
+* [Mbed OS configuration](https://os.mbed.com/docs/latest/reference/configuration.html).
+* [Mbed OS serial communication](https://os.mbed.com/docs/latest/tutorials/serial-communication.html).
+* [Mbed boards](https://os.mbed.com/platforms/).
+
+### License and contributions
+
+The software is provided under the Apache-2.0 license. Contributions to this project are accepted under the same license. Please see contributing.md for more information.
 
 This project contains code from other projects. The original license text is included in those source files. They must comply with our license guide.
 

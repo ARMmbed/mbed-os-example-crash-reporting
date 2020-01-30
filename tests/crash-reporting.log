@@ -1,33 +1,32 @@
 = System will be rebooted due to a fatal error =
-= Reboot count\(=1\) reached maximum, system will halt after rebooting =
-mbed_error_reboot_callback: System rebooting, reboot error callback received
 
-Mbed-OS crash reporting test: main\(\)
+(before main) mbed_error_reboot_callback invoked with the following error context:
+    Status      : 0x[0-9a-fA-F]+
+    Value       : 0x[0-9a-fA-F]+
+    Address     : 0x[0-9a-fA-F]+
+    Reboot count: 0x[0-9a-fA-F]+
+    CRC         : 0x[0-9a-fA-F]+
 
-Successfully read reboot info ==>
+This is the crash reporting Mbed OS example
+2nd pass: Retrieve the fault context using mbed_get_reboot_fault_context
+    R0   : 0x[0-9a-fA-F]+
+    R1   : 0x[0-9a-fA-F]+
+    R2   : 0x[0-9a-fA-F]+
+    R3   : 0x[0-9a-fA-F]+
+    R4   : 0x[0-9a-fA-F]+
+    R5   : 0x[0-9a-fA-F]+
+    R6   : 0x[0-9a-fA-F]+
+    R7   : 0x[0-9a-fA-F]+
+    R8   : 0x[0-9a-fA-F]+
+    R9   : 0x[0-9a-fA-F]+
+    R10   : 0x[0-9a-fA-F]+
+    R11   : 0x[0-9a-fA-F]+
+    R12   : 0x[0-9a-fA-F]+
+    SP   : 0x[0-9a-fA-F]+
+    LR   : 0x[0-9a-fA-F]+
+    PC   : 0x[0-9a-fA-F]+
+    xPSR : 0x[0-9a-fA-F]+
+    PSP  : 0x[0-9a-fA-F]+
+    MSP  : 0x[0-9a-fA-F]+
 
-  error status: 0x[0-9a-fA-F]+
-  error value: 0x[0-9a-fA-F]+
-  error address: 0x[0-9a-fA-F]+
-  error reboot count: 0x[0-9a-fA-F]+
-  error crc: 0x[0-9a-fA-F]+
-
-Crash Report data captured:
-\[0\]: 0x[0-9a-fA-F]+
-\[1\]: 0x[0-9a-fA-F]+
-\[2\]: 0x[0-9a-fA-F]+
-\[3\]: 0x[0-9a-fA-F]+
-\[4\]: 0x[0-9a-fA-F]+
-\[5\]: 0x[0-9a-fA-F]+
-\[6\]: 0x[0-9a-fA-F]+
-\[7\]: 0x[0-9a-fA-F]+
-\[8\]: 0x[0-9a-fA-F]+
-\[9\]: 0x[0-9a-fA-F]+
-\[10\]: 0x[0-9a-fA-F]+
-\[11\]: 0x[0-9a-fA-F]+
-\[12\]: 0x[0-9a-fA-F]+
-\[13\]: 0x[0-9a-fA-F]+
-\[14\]: 0x[0-9a-fA-F]+
-\[15\]: 0x[0-9a-fA-F]+
-
-Mbed-OS crash reporting test completed
+Mbed OS crash reporting example completed
