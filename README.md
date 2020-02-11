@@ -1,9 +1,9 @@
 ![](./resources/official_armmbed_example_badge.png)
-# Crash Reporting Mbed OS example
+# Crash reporting Mbed OS example
 
-This example demonstrates how Mbed OS crash reporting works on a Mbed OS enabled platform.
+This example demonstrates how Mbed OS crash reporting works on an Mbed OS Enabled platform.
 
-You can find more information about the crash reporting APIs [here](https://os.mbed.com/docs/mbed-os/v5.15/apis/error-handling.html#crash-reporting-and-auto-reboot).
+You can find more information about the crash reporting APIs [in the documetnation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
 You can build this project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tool [Arm Mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli).
 
@@ -13,18 +13,31 @@ You can build this project with all supported [Mbed OS build tools](https://os.m
 
 ## Application functionality
 
-This example demonstrates the Mbed OS crash-reporting feature and the APIs associated with it. In the first pass, the application generates a fault wich causes the system to reboot. In the second pass, the application detects that the reboot was caused by an error and prints the fault context information in the console.
+This example demonstrates the Mbed OS crash reporting feature and the APIs associated with it. In the first pass, the application generates a fault that causes the system to reboot. In the second pass, the application detects that the reboot was caused by an error and prints the fault context information in the console.
 
 First pass:
-- During Mbed OS initialization, the system checks the Crash-data-RAM region and detects that there was no fault.
-- main() is called.
-   - An exception is generated which causes an auto-reboot (warm-reset) of the system. The system captures the error-context in a special location in RAM before triggering the auto-reboot.
-- The system auto-reboots.
+
+1. During Mbed OS initialization, the system checks the Crash-data-RAM region and detects there was no fault.
+1. `main()` is called.
+   1. An exception is generated.
+   1. The system captures the error-context in a special location in RAM.
+1. The system auto-reboots (warm-resets).
 
 Second pass:
-- During Mbed OS initialization, the system checks the Crash-data-RAM region, detects that the reboot was due to a fatal error and calls `mbed_error_reboot_callback()` with a pointer to the error context stored in RAM. In this example, the callback function (WEAK function) is overridden. A global variable `reboot_error_happened` is set to record that reboot was due to an error. Then the function prints information about the error context in the console and resets the saved context captured by the system in RAM using `mbed_reset_reboot_error_info()`.
-- main() is called.
-   - The application detects that the reboot was caused by an error using `reboot_error_happened`. It proceeds to retrieves the fault context using `mbed_get_reboot_fault_context()` and prints it.
+
+1. During Mbed OS initialization, the system:
+   1. Checks the Crash-data-RAM region,.
+   1. Detects that the reboot was due to a fatal error.
+   1. Calls `mbed_error_reboot_callback()` with a pointer to the error context stored in RAM.
+   
+   In this example:
+      1. The callback function (WEAK function) is overridden.
+      1. A global variable `reboot_error_happened` is set to record that reboot was due to an error.
+      1. The function prints information about the error context in the console and resets the saved context captured by the system in RAM using `mbed_reset_reboot_error_info()`.
+      
+1. `main()` is called.
+   1. The application detects that the reboot was caused by an error using `reboot_error_happened`.
+   1. It retrieves the fault context using `mbed_get_reboot_fault_context()` and prints it.
 
 ## Building and running
 
@@ -51,7 +64,8 @@ $ mbed compile -S
 
 ## Expected output
 
-The serial terminal shows an output similar to the following:
+The serial terminal shows an output similar to:
+
 ```
 --- Terminal on /dev/tty.usbmodem11102 - 9600,8,N,1 ---
 
@@ -139,9 +153,11 @@ This is the crash reporting Mbed OS example.
 
 Mbed OS crash reporting example completed
 ```
+
 ## Configuring the application
 
 You can enable the crash reporting feature by setting `platform.crash-capture-enabled` to true in the application configuration file:
+
 ```
 {
     "target_overrides": {
@@ -152,36 +168,38 @@ You can enable the crash reporting feature by setting `platform.crash-capture-en
 }
 ```
 
-At present this feature is only enabled on some targets by default. To enable it on your target then your target the scatter file should be modified to reserve a dedicated region in RAM. You can find more details [here](https://os.mbed.com/docs/mbed-os/v5.15/apis/error-handling.html#crash-reporting-and-auto-reboot).
+This feature is enabled on some targets by default. To enable it on your target, modify the scatter file to reserve a dedicated region in RAM. You can find more details [in the documentation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
 ## Using mbed_get_reboot_error_info() to retrieve the reboot error context
 
 You can retrieve the reboot error context in two ways:
-1. Using `mbed_error_reboot_callback()` as shown in this example.
-1. Or using `mbed_get_reboot_error_info()` as shown below:
 
-```
-int main()
-{
-    mbed_error_ctx error_context;
-    if (mbed_get_reboot_error_info(&error_context) != MBED_ERROR_ITEM_NOT_FOUND) {
-        printf("Retrieved reboot error context\n");
-            
-        mbed_fault_context_t fault_ctx;
-        mbed_get_reboot_fault_context(&fault_ctx);
-        printf("Retrieved fault context\n");
-    }
-}
-```
+- Using `mbed_error_reboot_callback()` as shown in this example.
+- Using `mbed_get_reboot_error_info()` as shown below:
+
+   ```
+   int main()
+   {
+       mbed_error_ctx error_context;
+       if (mbed_get_reboot_error_info(&error_context) != MBED_ERROR_ITEM_NOT_FOUND) {
+           printf("Retrieved reboot error context\n");
+               
+           mbed_fault_context_t fault_ctx;
+           mbed_get_reboot_fault_context(&fault_ctx);
+           printf("Retrieved fault context\n");
+       }
+   }
+   ```
 
 ## Troubleshooting 
+
 If you have problems, you can review the [documentation](https://os.mbed.com/docs/latest/tutorials/debugging.html) for suggestions on what could be wrong and how to fix it. 
 
 ## Related links
 
-* [Mbed OS configuration](https://os.mbed.com/docs/latest/reference/configuration.html).
-* [Mbed OS serial communication](https://os.mbed.com/docs/latest/tutorials/serial-communication.html).
-* [Mbed boards](https://os.mbed.com/platforms/).
+- [Mbed OS configuration](https://os.mbed.com/docs/latest/reference/configuration.html).
+- [Mbed OS serial communication](https://os.mbed.com/docs/latest/tutorials/serial-communication.html).
+- [Mbed boards](https://os.mbed.com/platforms/).
 
 ### License and contributions
 
