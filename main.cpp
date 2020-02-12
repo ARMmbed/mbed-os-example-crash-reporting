@@ -1,66 +1,82 @@
+/* Copyright (c) 2020 Arm Limited
+*
+* SPDX-License-Identifier: Apache-2.0
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 #include "mbed.h"
 #include "mbed_error.h"
 #include "mbed_fault_handler.h"
 
-mbed_error_ctx error_ctx;
-mbed_fault_context_t fault_ctx;
-void generate_bus_fault_unaligned_access();
-
-static int reboot_error_happened = 0;
-static bool continuous_reboot_test = false;
-
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
-void mbed_error_reboot_callback(mbed_error_ctx *error_context) {
-    printf("\nmbed_error_reboot_callback: System rebooting, reboot error callback received");
-    reboot_error_happened = 1;
-    mbed_get_reboot_error_info(&error_ctx);
-    mbed_reset_reboot_error_info();
-}
-#endif
-
-// main() runs in its own thread in the OS
-int main() {
-#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED  
-    printf("\n\nMbed-OS crash reporting test: main()\n");
-    if((reboot_error_happened == 0) || continuous_reboot_test) {
-        printf("\nForcing exception\n");
-        generate_bus_fault_unaligned_access();
-        printf("\nForcing exception failed\n");
-    } else {
-        if(error_ctx.error_status < 0) {
-            printf("\nSuccessfully read reboot info ==> \n");
-            printf("\n  error status: 0x%08lX", (uint32_t)error_ctx.error_status);
-            printf("\n  error value: 0x%08lX", (uint32_t)error_ctx.error_value);
-            printf("\n  error address: 0x%08lX", (uint32_t)error_ctx.error_address);
-            printf("\n  error reboot count: 0x%08lX", (uint32_t)error_ctx.error_reboot_count);
-            printf("\n  error crc: 0x%08lX\n", (uint32_t)error_ctx.crc_error_ctx);
-            
-            //Read fault context
-            if(error_ctx.error_status == MBED_ERROR_HARDFAULT_EXCEPTION) {
-                mbed_get_reboot_fault_context(&fault_ctx);
-                            
-                printf("\nCrash Report data captured:\n");
-                for(int i=0;i<16;i++) {
-                    printf("[%d]: 0x%08X\n", i, ((uint32_t *)(&fault_ctx))[i]);
-                }
-            }
-        }
-    }
-    
-    printf("\nMbed-OS crash reporting test completed\n");
-#else
-    printf("\nMbed-OS crash reporting feature is disabled\n"); 
-#endif    
-}
+mbed_error_status_t err_status;
+mbed_fault_context_t fault_ctx;
+static bool reboot_error_happened = false;
 
 void generate_bus_fault_unaligned_access()
 {
     SCB->CCR |= SCB_CCR_UNALIGN_TRP_Msk;
     uint32_t inv_addr = 0xAAA3;
     uint32_t val = *(uint32_t *)inv_addr;
-    
-    printf("\nval= %X", val);
-    
-    return;
-
+    printf("Now generate the fault: val= %X\n", (unsigned int)val);
 }
+
+// Application callback function for reporting error context during boot up.
+void mbed_error_reboot_callback(mbed_error_ctx *error_context)
+{
+    reboot_error_happened = true;
+    err_status = error_context->error_status;
+    printf("\n\n(before main) mbed_error_reboot_callback invoked with the following error context:\n");
+    printf("    Status      : 0x%lX\n", (uint32_t)error_context->error_status);
+    printf("    Value       : 0x%lX\n", (uint32_t)error_context->error_value);
+    printf("    Address     : 0x%lX\n", (uint32_t)error_context->error_address);
+    printf("    Reboot count: 0x%lX\n", (uint32_t)error_context->error_reboot_count);
+    printf("    CRC         : 0x%lX\n", (uint32_t)error_context->crc_error_ctx);
+    mbed_reset_reboot_error_info();
+}
+#endif
+
+int main()
+{
+#if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
+    printf("\nThis is the crash reporting Mbed OS example\n");
+    if (!reboot_error_happened) {
+        printf("1st run: Inject the fault exception\n");
+        generate_bus_fault_unaligned_access();
+    } else {
+        if (err_status < 0) {
+            printf("2nd run: Retrieve the fault context using mbed_get_reboot_fault_context\n");
+            if (err_status == MBED_ERROR_HARDFAULT_EXCEPTION) {
+                mbed_get_reboot_fault_context(&fault_ctx);
+                for (int i = 0; i < 13; i++) {
+                    printf("    R%d   : 0x%X\n", i, ((unsigned int *)(&fault_ctx))[i]);
+                }
+                printf("    SP   : 0x%X\n"
+                       "    LR   : 0x%X\n"
+                       "    PC   : 0x%X\n"
+                       "    xPSR : 0x%X\n"
+                       "    PSP  : 0x%X\n"
+                       "    MSP  : 0x%X\n", (unsigned int)fault_ctx.SP_reg, (unsigned int)fault_ctx.LR_reg, (unsigned int)fault_ctx.PC_reg,
+                       (unsigned int)fault_ctx.xPSR, (unsigned int)fault_ctx.PSP, (unsigned int)fault_ctx.MSP);
+            } else {
+                printf("ERROR: Unexpected error status %x\n", err_status);
+            }
+        }
+    }
+    printf("\nMbed OS crash reporting example completed\n");
+#else
+    printf("Mbed OS crash reporting is not enabled\n");
+#endif
+}
+
+
