@@ -8,7 +8,7 @@
     CRC         : 0x[0-9a-fA-F]+
 
 This is the crash reporting Mbed OS example
-2nd pass: Retrieve the fault context using mbed_get_reboot_fault_context
+2nd run: Retrieve the fault context using mbed_get_reboot_fault_context
     R0   : 0x[0-9a-fA-F]+
     R1   : 0x[0-9a-fA-F]+
     R2   : 0x[0-9a-fA-F]+

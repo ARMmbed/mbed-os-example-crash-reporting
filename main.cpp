@@ -51,11 +51,11 @@ int main()
 #if MBED_CONF_PLATFORM_CRASH_CAPTURE_ENABLED
     printf("\nThis is the crash reporting Mbed OS example\n");
     if (!reboot_error_happened) {
-        printf("1st pass: Inject the fault exception\n");
+        printf("1st run: Inject the fault exception\n");
         generate_bus_fault_unaligned_access();
     } else {
         if (err_status < 0) {
-            printf("2nd pass: Retrieve the fault context using mbed_get_reboot_fault_context\n");
+            printf("2nd run: Retrieve the fault context using mbed_get_reboot_fault_context\n");
             if (err_status == MBED_ERROR_HARDFAULT_EXCEPTION) {
                 mbed_get_reboot_fault_context(&fault_ctx);
                 for (int i = 0; i < 13; i++) {

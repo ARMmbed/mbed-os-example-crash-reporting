@@ -13,31 +13,32 @@ You can build this project with all supported [Mbed OS build tools](https://os.m
 
 ## Application functionality
 
-This example demonstrates the Mbed OS crash reporting feature and the APIs associated with it. In the first pass, the application generates a fault that causes the system to reboot. In the second pass, the application detects that the reboot was caused by an error and prints the fault context information in the console.
+This example demonstrates the Mbed OS crash reporting feature and the APIs associated with it. In the first run, the application generates a fault that causes the system to reboot. In the second run, the application detects that the reboot was caused by an error and prints the fault context information in the console.
 
-First pass:
+First run:
 
 1. During Mbed OS initialization, the system checks the Crash-data-RAM region and detects there was no fault.
-1. `main()` is called.
-   1. An exception is generated.
+1. The startup code calls `main()`.
+   1. The application generates an exception.
    1. The system captures the error-context in a special location in RAM.
 1. The system auto-reboots (warm-resets).
 
-Second pass:
+Second run:
 
 1. During Mbed OS initialization, the system:
-   1. Checks the Crash-data-RAM region,.
+   1. Checks the Crash-data-RAM region.
    1. Detects that the reboot was due to a fatal error.
    1. Calls `mbed_error_reboot_callback()` with a pointer to the error context stored in RAM.
    
-   In this example:
-      1. The callback function (WEAK function) is overridden.
-      1. A global variable `reboot_error_happened` is set to record that reboot was due to an error.
-      1. The function prints information about the error context in the console and resets the saved context captured by the system in RAM using `mbed_reset_reboot_error_info()`.
+   In this example, the application has overridden the callback function (WEAK function). The function:
+      1. Sets a global variable `reboot_error_happened` to record that the reboot was due to an error.
+      1. Prints information about the error context in the console. 
+      1. Resets the saved context captured by the system in RAM using `mbed_reset_reboot_error_info()`.
       
-1. `main()` is called.
-   1. The application detects that the reboot was caused by an error using `reboot_error_happened`.
-   1. It retrieves the fault context using `mbed_get_reboot_fault_context()` and prints it.
+1. The startup code calls `main()`. The application:
+   1. Checks `reboot_error_happened`.
+   1. Retrieves the fault context using `mbed_get_reboot_fault_context()`.
+   1. Prints the fault context.
 
 ## Building and running
 
@@ -70,7 +71,7 @@ The serial terminal shows an output similar to:
 --- Terminal on /dev/tty.usbmodem11102 - 9600,8,N,1 ---
 
 This is the crash reporting Mbed OS example
-1st pass: Inject the fault exception
+1st run: Inject the fault exception
 
 ++ MbedOS Fault Handler ++
 
@@ -130,7 +131,7 @@ For more info, visit: https://mbed.com/s/error?error=0x80FF013D&tgt=K64F
     CRC         : 0x60F72ECE
 
 This is the crash reporting Mbed OS example.
-2nd pass: Retrieve the fault context using mbed_get_reboot_fault_context
+2nd run: Retrieve the fault context using mbed_get_reboot_fault_context
     R0   : 0xDE54
     R1   : 0x0
     R2   : 0xE000ED00
