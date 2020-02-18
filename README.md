@@ -3,7 +3,7 @@
 
 This example demonstrates how Mbed OS crash reporting works on an Mbed OS Enabled platform.
 
-You can find more information about the crash reporting APIs [in the documetnation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
+You can find more information about the crash reporting APIs in the [documentation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
 You can build this project with all supported [Mbed OS build tools](https://os.mbed.com/docs/mbed-os/latest/tools/index.html). However, this example project specifically refers to the command-line interface tool [Arm Mbed CLI](https://github.com/ARMmbed/mbed-cli#installing-mbed-cli).
 
@@ -169,7 +169,7 @@ You can enable the crash reporting feature by setting `platform.crash-capture-en
 }
 ```
 
-This feature is enabled on some targets by default. To enable it on your target, modify the scatter file to reserve a dedicated region in RAM. You can find more details [in the documentation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
+This feature is enabled on some targets by default. To enable it on your target, modify the scatter file to reserve a dedicated region in RAM. You can find more details in the [documentation](https://os.mbed.com/docs/mbed-os/latest/apis/error-handling.html#crash-reporting-and-auto-reboot).
 
 ## Using mbed_get_reboot_error_info() to retrieve the reboot error context
 
