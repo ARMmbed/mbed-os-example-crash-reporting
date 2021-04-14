@@ -67,7 +67,7 @@ Second run:
     $ mbed compile -m <TARGET> -t <TOOLCHAIN> --flash
     ```
 
-(Note: You can use the Mbed CLI command-line option `--sterm` to open a serial terminal after flashing.)
+(Note: You can use the Mbed CLI command-line option `--sterm --baudrate 115200` to open a serial terminal after flashing.)
 
 Your PC may take a few minutes to compile your code.
 
